@@ -147,8 +147,34 @@ window.addEventListener(
             return;
         }
 
+        const targetMs =
+            currentTime * 1000;
+
+        const currentMs =
+            Number(
+                mediaPlayer
+                    ?.timeline
+                    ?.info
+                    ?.playheadPositionMs
+            );
+
+        const differenceMs =
+            Math.abs(
+                currentMs -
+                targetMs
+            );
+
+        if (
+            Number.isFinite(
+                currentMs
+            ) &&
+            differenceMs < 1500
+        ) {
+            return;
+        }
+
         mediaPlayer.seek(
-            currentTime * 1000
+            targetMs
         );
     }
 );
@@ -226,64 +252,19 @@ window.addEventListener(
             return;
         }
 
-        function findProgressBar(
-            root
-        ) {
-            if (!root) {
-                return null;
-            }
-
-            const direct =
-                root.querySelector?.(
-                    "progress-bar"
-                );
-
-            if (direct) {
-                return direct;
-            }
-
-            const elements =
-                root.querySelectorAll?.(
-                    "*"
-                ) || [];
-
-            for (
-                const element of
-                elements
-            ) {
-                if (
-                    !element.shadowRoot
-                ) {
-                    continue;
-                }
-
-                const found =
-                    findProgressBar(
-                        element.shadowRoot
-                    );
-
-                if (found) {
-                    return found;
-                }
-            }
-
-            return null;
-        }
-
-        const progressBar =
-            findProgressBar(
-                document
+        const webPlayer =
+            document.querySelector(
+                "disney-web-player"
             );
 
-        if (!progressBar) {
-            return;
-        }
+        const mediaPlayer =
+            webPlayer?.mediaPlayer;
 
         const playheadPositionMs =
             Number(
-                progressBar
-                    ?.streamController
-                    ?.value
+                mediaPlayer
+                    ?.timeline
+                    ?.info
                     ?.playheadPositionMs
             );
 

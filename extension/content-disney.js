@@ -215,6 +215,66 @@ function findVideo() {
     );
 }
 
+function updateDisneySubtitlePosition() {
+    function findInShadow(
+        root,
+        selector
+    ) {
+        const found =
+            root.querySelector?.(
+                selector
+            );
+
+        if (found) {
+            return found;
+        }
+
+        const elements =
+            root.querySelectorAll?.(
+                "*"
+            ) || [];
+
+        for (
+            const element of elements
+        ) {
+            if (
+                !element.shadowRoot
+            ) {
+                continue;
+            }
+
+            const foundInside =
+                findInShadow(
+                    element.shadowRoot,
+                    selector
+                );
+
+            if (foundInside) {
+                return foundInside;
+            }
+        }
+
+        return null;
+    }
+
+    const subtitleLayer =
+        findInShadow(
+            document,
+            ".timed-text-override-region"
+        );
+
+    if (!subtitleLayer) {
+        return;
+    }
+
+    subtitleLayer.style.setProperty(
+    "transform",
+    "translate(170px, 100px)",
+    "important"
+);
+
+}
+
 function installSeekBarFix() {
     let suppressUntil = 0;
 
@@ -1167,7 +1227,10 @@ const adjustedDifference =
 
 if (
     action === "seek" ||
-    action === "sync"
+    (
+        action === "sync" &&
+        adjustedDifference > 1.5
+    )
 ) {
     const requestedTime =
         Math.max(
@@ -1780,6 +1843,7 @@ const observer =
         }
 
         createPanel();
+        updateDisneySubtitlePosition();
 
         const videoChanged =
             video !== currentVideo;

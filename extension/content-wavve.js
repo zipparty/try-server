@@ -667,13 +667,32 @@ const viewportHeight =
     }
 
     function scheduleScaleUpdate() {
-        clearTimeout(updateTimer);
+    clearTimeout(updateTimer);
 
-        updateTimer = setTimeout(
-            updatePlayerScale,
-            50
-        );
-    }
+    updatePlayerScale();
+
+    updateTimer = setTimeout(
+        () => {
+            updatePlayerScale();
+
+            setTimeout(
+                updatePlayerScale,
+                150
+            );
+
+            setTimeout(
+                updatePlayerScale,
+                300
+            );
+
+            setTimeout(
+                updatePlayerScale,
+                600
+            );
+        },
+        50
+    );
+}
 
     function setPanelWidth(width) {
         panelWidth = width;
@@ -1543,8 +1562,8 @@ document.documentElement.appendChild(
 
 
         attachVideoEvents();
-        updatePlayerScale();
-        startPeriodicSync();
+scheduleScaleUpdate();
+startPeriodicSync();
     }
 
     function restorePlayer() {

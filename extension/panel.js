@@ -81,6 +81,8 @@ const replyCancelButton =
     let inviteRoomCode = "";
     let currentReplyTo = null;
 
+
+
     function showJoinScreen() {
         joinSection.hidden = false;
         roomSection.hidden = true;
@@ -140,10 +142,11 @@ function requireNickname() {
         emptyChat.hidden = true;
 
         const item = document.createElement("li");
-        item.className = "tvp-system-message";
-        item.textContent = text;
+item.className = "tvp-system-message";
+item.textContent = text;
+item.style.whiteSpace = "pre-line";
 
-        messageList.appendChild(item);
+messageList.appendChild(item);
         messageList.parentElement.scrollTop =
     messageList.parentElement.scrollHeight;
     }
@@ -415,15 +418,24 @@ sessionStorage.setItem(
         );
 
         showSystemMessage(
-            isHost
-                ? "새 방을 만들었습니다."
-                : `${room} 방에 참가했습니다.`
-        );
+    isHost
+        ? "새 방을 만들었습니다."
+        : `${room} 방에 참가했습니다.`
+);
 
-        messageInput.focus();
+
+showSystemMessage(
+    "\n⚠ 디즈니+ 오류 수정 중\n\n싱크가 맞지 않는 경우\n호스트 화면에서 일시정지 > 재생을 눌러 주세요."
+);
+
+
+messageInput.focus();
     }
 
-    function rejoinSavedRoom(roomCode) {
+    function rejoinSavedRoom(
+    roomCode,
+    retryCount = 0
+) {
     const savedRoom =
         sessionStorage.getItem(
             "tvpRoomCode"
@@ -433,7 +445,7 @@ sessionStorage.setItem(
         sessionStorage.getItem(
             "tvpNickname"
         );
- 
+
     const savedWasHost =
         sessionStorage.getItem(
             "tvpWasHost"
@@ -472,10 +484,30 @@ sessionStorage.setItem(
                 response &&
                 response.success === false
             ) {
-                console.warn(
-                    "TVP 자동 재참가 실패:",
-                    response.message
-                );
+                const message =
+                    String(
+                        response.message || ""
+                    );
+
+
+                if (
+                    message.includes(
+                        "이미 사용 중인 닉네임"
+                    ) &&
+                    retryCount < 5
+                ) {
+                    setTimeout(
+                        () => {
+                            rejoinSavedRoom(
+                                room,
+                                retryCount + 1
+                            );
+                        },
+                        1000
+                    );
+
+                    return;
+                }
 
                 return;
             }
