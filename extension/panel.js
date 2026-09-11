@@ -428,6 +428,10 @@ showSystemMessage(
     "\n⚠ 디즈니+ 오류 수정 중\n\n싱크가 맞지 않는 경우\n호스트 화면에서 일시정지 > 재생을 눌러 주세요."
 );
 
+showSystemMessage(
+    "\n원활한 서버 운용을 위해 무단 배포를 금합니다."
+);
+
 
 messageInput.focus();
     }
